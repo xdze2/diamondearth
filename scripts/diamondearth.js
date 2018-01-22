@@ -66,7 +66,31 @@ Diamond.prototype.subdivise = function() {
  */
 Diamond.prototype.points = function() {
     let points = [ this.N, this.E, this.S, this.W ]
-        .map( x => [x.lat, x.lon] )
 
-    return points;
+    k = 4   // number of refinement
+    for (let i = 0; i<k; i++){
+        points = refinePolygon(points)
+    }
+    console.log(points)
+    return points.map( x => [x.lat, x.lon] )
 };
+
+/**
+ * Subdivise the segments of a polygon along the geodesic line
+ *
+ * @param {Array of LatLon object}
+ *
+ */
+function refinePolygon( cardinalPoints ){
+    // add the mid point for every segment
+    let points = []
+    for (let i = 0; i < cardinalPoints.length; i++) {
+        startpoint = cardinalPoints[i]
+        endpoint = cardinalPoints[ ((i+1 < cardinalPoints.length) ? i+1 : 0) ]
+
+        let midpoint = startpoint.midpointTo( endpoint )
+        points.push( startpoint )
+        points.push( midpoint )
+    }
+    return points
+}
