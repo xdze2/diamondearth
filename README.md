@@ -1,6 +1,6 @@
 j'ai un autre projet de cartographie.
 
-Je ne sais pas si tu as vu l'appli What3words. Leur idée est de proposer un système d'adressage physique universel. Comme les coordonnées GPS (latitude, longitude) mais lisible et mémorisable par un humain et qui pourrait remplacer éventuellement l'adressage postale (pays, ville, rue, numéro).
+L'idée part de l'appli What3words. Leur idée est de proposer un système d'adressage physique universel. Comme les coordonnées GPS (latitude, longitude) mais lisible et mémorisable par un humain et qui pourrait remplacer éventuellement l'adressage postale (pays, ville, rue, numéro).
 
 Ils ont découpés la surface du globe en carrés de 3 par 3 mètres de coté, et assigné arbitrairement un triplet de mot à chacun.
 
