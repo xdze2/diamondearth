@@ -68,7 +68,7 @@ Diamond.prototype.subdivise = function() {
 Diamond.prototype.points = function() {
     let points = [ this.N, this.E, this.S, this.W ]
 
-    k = 0   // number of refinement
+    k = 8   // number of refinement
     for (let i = 0; i<k; i++){
         points = refinePolygon(points)
     }

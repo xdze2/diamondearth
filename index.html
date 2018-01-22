@@ -54,15 +54,16 @@
         // let losangeA = L.losange(latlngs, {color: 'red'}).addTo(map);
 
         // Level 0
-        // let N = new LatLon(0, 90)
-        // let E = new LatLon(90, 0)
-        // let S = new LatLon(0, -90)
-        // let W = new LatLon(-90, 0)
+        let thetaZero = +20   // arbitrary orientation angle for the octaedre
+        let N = new LatLon(90, thetaZero)
+        let E = new LatLon(0, thetaZero + 45)
+        let S = new LatLon(-90, thetaZero)
+        let W = new LatLon(0, thetaZero - 45)
 
-        let N = new LatLon(10, 0)
-        let E = new LatLon(0, 10)
-        let S = new LatLon(-10, 0)
-        let W = new LatLon(0, -10)
+        // let N = new LatLon(10, 0)
+        // let E = new LatLon(0, 10)
+        // let S = new LatLon(-10, 0)
+        // let W = new LatLon(0, -10)
 
         let losange = new Diamond( N, E, S, W, 0 )
         let Llosange = L.polygon(losange.points(), {color: 'blue'}).addTo(map);
@@ -76,7 +77,7 @@
         // let D1 = L.polygon(subdiamonds[3].points(), {color: 'yellow'}).addTo(map);
 
         // Level 2
-        let foo = subdiamonds[1]
+        let foo = subdiamonds[0]
         let subsubdiamonds1 = foo.subdivise()
         let A2 = L.polygon(subsubdiamonds1[0].points(), {color: 'white'}).addTo(map);
         let B2 = L.polygon(subsubdiamonds1[1].points(), {color: 'green'}).addTo(map);
