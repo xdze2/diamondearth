@@ -22,11 +22,12 @@
  *
  *    let A = new Diamond( N, E, S, W )
  */
- function Diamond(N, E, S, W) {
-    this.N = N;
-    this.E = E;
-    this.S = S;
-    this.W = W;
+ function Diamond(N, E, S, W, level) {
+    this.N = N
+    this.E = E
+    this.S = S
+    this.W = W
+    this.level = level
  }
 
 
@@ -37,16 +38,16 @@
   *
   */
 Diamond.prototype.subdivise = function() {
-    let NE = this.N.midpointTo(E)
-    let SE = this.S.midpointTo(E)
-    let SW = this.S.midpointTo(W)
-    let NW = this.N.midpointTo(W)
-    let O  = this.W.midpointTo(E)
+    let NE = this.N.midpointTo( this.E )
+    let SE = this.S.midpointTo( this.E )
+    let SW = this.S.midpointTo( this.W )
+    let NW = this.N.midpointTo( this.W )
+    let O  = this.E.midpointTo( this.W )
 
-    let A = new Diamond( N, NE, O, NW )
-    let B = new Diamond( NE, E, SE, O )
-    let C = new Diamond( O, SE, S, SW )
-    let D = new Diamond( NW, O, SW, W )
+    let A = new Diamond( this.N, NE, O, NW, this.level+1 )
+    let B = new Diamond( NE, this.E, SE, O, this.level+1 )
+    let C = new Diamond( O, SE, this.S, SW, this.level+1 )
+    let D = new Diamond( NW, O, SW, this.W, this.level+1 )
 
     return [A, B, C, D]
 }
@@ -67,11 +68,10 @@ Diamond.prototype.subdivise = function() {
 Diamond.prototype.points = function() {
     let points = [ this.N, this.E, this.S, this.W ]
 
-    k = 4   // number of refinement
+    k = 0   // number of refinement
     for (let i = 0; i<k; i++){
         points = refinePolygon(points)
     }
-    console.log(points)
     return points.map( x => [x.lat, x.lon] )
 };
 
@@ -79,7 +79,7 @@ Diamond.prototype.points = function() {
  * Subdivise the segments of a polygon along the geodesic line
  *
  * @param {Array of LatLon object}
- *
+ * @return {Array of LatLon object}
  */
 function refinePolygon( cardinalPoints ){
     // add the mid point for every segment

@@ -53,23 +53,35 @@
         // ];
         // let losangeA = L.losange(latlngs, {color: 'red'}).addTo(map);
 
-        let N = new LatLon(0, 20)
-        let E = new LatLon(40, 0)
-        let S = new LatLon(0, -20)
-        let W = new LatLon(-40, 0)
+        // Level 0
+        // let N = new LatLon(0, 90)
+        // let E = new LatLon(90, 0)
+        // let S = new LatLon(0, -90)
+        // let W = new LatLon(-90, 0)
 
-        let losange = new Diamond( N, E, S, W )
+        let N = new LatLon(10, 0)
+        let E = new LatLon(0, 10)
+        let S = new LatLon(-10, 0)
+        let W = new LatLon(0, -10)
 
-        let subdiamonds = losange.subdivise()
-
-        console.log(losange.points())
-
+        let losange = new Diamond( N, E, S, W, 0 )
         let Llosange = L.polygon(losange.points(), {color: 'blue'}).addTo(map);
 
+        // Level 1
+        let subdiamonds = losange.subdivise()
 
-        let A = L.polygon(subdiamonds[0].points(), {color: 'red'}).addTo(map);
-        let B = L.polygon(subdiamonds[1].points(), {color: 'green'}).addTo(map);
+        // let A1 = L.polygon(subdiamonds[0].points(), {color: 'red'}).addTo(map);
+        // let B1 = L.polygon(subdiamonds[1].points(), {color: 'green'}).addTo(map);
+        // let C1 = L.polygon(subdiamonds[2].points(), {color: 'purple'}).addTo(map);
+        // let D1 = L.polygon(subdiamonds[3].points(), {color: 'yellow'}).addTo(map);
 
+        // Level 2
+        let foo = subdiamonds[1]
+        let subsubdiamonds1 = foo.subdivise()
+        let A2 = L.polygon(subsubdiamonds1[0].points(), {color: 'white'}).addTo(map);
+        let B2 = L.polygon(subsubdiamonds1[1].points(), {color: 'green'}).addTo(map);
+        let C2 = L.polygon(subsubdiamonds1[2].points(), {color: 'yellow'}).addTo(map);
+        let D2 = L.polygon(subsubdiamonds1[3].points(), {color: 'blue'}).addTo(map);
 
         // var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
 
