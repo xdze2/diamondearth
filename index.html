@@ -17,14 +17,18 @@
         integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
         crossorigin=""></script>
 
-    <script src="scripts/Leaflet.Geodesic.js"></script>
+    <!-- <script src="scripts/Leaflet.Geodesic.js"></script> -->
+    <!-- see https://github.com/chrisveness/geodesy -->
+    <script src="geodesy/vector3d.js"></script>
+    <script src="geodesy/latlon-vectors.js"></script>
+    <script src="geodesy/dms.js"></script>
 
-    <script src="scripts/latlon-spherical.js"></script>
-    <script src="scripts/dms.js"></script>
+    <script type="text/javascript" src="scripts/diamondearth.js"></script>
+
 </head>
 
 <body>
-    hello
+    <h1> Diamond Earth </h1>
 
      <div id="earthmap"></div>
 
@@ -41,36 +45,56 @@
         // ];
         // var losangeA = L.polygon(latlngs, {color: 'red'}).addTo(map);
 
-        var latlngs = [
-            [1, 1],
-            [1, 0],
-            [0, 0],
-            [0, 1]
-        ];
-        var losangeA = L.polygon(latlngs, {color: 'red'}).addTo(map);
+        // var latlngs = [
+        //     [1, 1],
+        //     [1, 0],
+        //     [0, 0],
+        //     [0, 1]
+        // ];
+        // let losangeA = L.losange(latlngs, {color: 'red'}).addTo(map);
 
-        var Geodesic = L.geodesic([], {
-        	weight: 4,
-        	opacity: 0.5,
-        	color: 'blue',
-        	steps: 50
-        }).addTo(map);
+        let N = new LatLon(0, 20)
+        let E = new LatLon(40, 0)
+        let S = new LatLon(0, -20)
+        let W = new LatLon(-40, 0)
 
-        var N = new L.LatLng(90, 0);
-        var S = new L.LatLng()
-        var A = new L.LatLng(0, 0);
-        var B = new L.LatLng(0, 90);
-        var C = new L.LatLng(0, 180);
-        var D = new L.LatLng(0, 270);
-        Geodesic.setLatLngs([[N, A], [N, B],
-                             [N, C], [N, D]]);
+        let losange = new Diamond( N, E, S, W )
 
-        var p1 = new LatLon(50.06632, -5.71475);
-        var p2 = new LatLon(58.64402, -3.07009);
-        var d = p1.distanceTo(p2);
-        console.assert(d.toFixed(3) == '968874.704');
-        var mid = p1.midpointTo(p2);
-        console.assert(mid.toString() == '54°21′44″N, 004°31′51″W');
+        let subdiamonds = losange.subdivise()
+
+        console.log(losange.points())
+
+        let Llosange = L.polygon(losange.points(), {color: 'blue'}).addTo(map);
+
+
+        let A = L.polygon(subdiamonds[0].points(), {color: 'red'}).addTo(map);
+        let B = L.polygon(subdiamonds[1].points(), {color: 'green'}).addTo(map);
+
+
+        // var polygon = L.polygon(latlngs, {color: 'red'}).addTo(map);
+
+        // var Geodesic = L.geodesic([], {
+        // 	weight: 4,
+        // 	opacity: 0.5,
+        // 	color: 'blue',
+        // 	steps: 50
+        // }).addTo(map);
+        //
+        // var N = new L.LatLng(90, 0);
+        // var S = new L.LatLng()
+        // var A = new L.LatLng(0, 0);
+        // var B = new L.LatLng(0, 90);
+        // var C = new L.LatLng(0, 180);
+        // var D = new L.LatLng(0, 270);
+        // Geodesic.setLatLngs([[N, A], [N, B],
+        //                      [N, C], [N, D]]);
+        //
+        // var p1 = new LatLon(50.06632, -5.71475);
+        // var p2 = new LatLon(58.64402, -3.07009);
+        // var d = p1.distanceTo(p2);
+        // console.assert(d.toFixed(3) == '968874.704');
+        // var mid = p1.midpointTo(p2);
+        // console.assert(mid.toString() == '54°21′44″N, 004°31′51″W');
     </script>
 </body>
 
