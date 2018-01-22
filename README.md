@@ -1,5 +1,3 @@
-j'ai un autre projet de cartographie.
-
 L'idée part de l'appli What3words. Leur idée est de proposer un système d'adressage physique universel. Comme les coordonnées GPS (latitude, longitude) mais lisible et mémorisable par un humain et qui pourrait remplacer éventuellement l'adressage postale (pays, ville, rue, numéro).
 
 Ils ont découpés la surface du globe en carrés de 3 par 3 mètres de coté, et assigné arbitrairement un triplet de mot à chacun.
@@ -15,3 +13,7 @@ Il est aussi possible de changer les syllabes en fonction du niveau. Cela peut �
 Le système de découpage en losange respecte aussi les points cardinaux. Sans ordinateur, il est dois donc être possible de naviguer d'une adresse à une autre.
 
 Enfin, la transposition de l'adresse à partir des coordonnées GPS est réalisable par un algorithme, à priori, relativement simple. Il ne doit donc pas avoir besoin de serveur, base de donnée et donc pas besoin de connexion internet.
+
+## Run with
+
+    python -m SimpleHTTPServer
