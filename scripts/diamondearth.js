@@ -1,5 +1,4 @@
-
-
+"use strict";
 
 
 
@@ -63,7 +62,7 @@ Diamond.prototype.subdivise = function() {
 Diamond.prototype.points = function() {
     let points = this.cardinalPoints
 
-    k = 8   // number of refinement
+    let k = 8   // number of refinement
     for (let i = 0; i<k; i++){
         points = refinePolygon(points)
     }
@@ -80,8 +79,8 @@ function refinePolygon( cardinalPoints ){
     // add the mid point for every segment
     let points = []
     for (let i = 0; i < cardinalPoints.length; i++) {
-        startpoint = cardinalPoints[i]
-        endpoint = cardinalPoints[ ((i+1 < cardinalPoints.length) ? i+1 : 0) ]
+        let startpoint = cardinalPoints[i]
+        let endpoint = cardinalPoints[ ((i+1 < cardinalPoints.length) ? i+1 : 0) ]
 
         let midpoint = startpoint.midpointTo( endpoint )
         points.push( startpoint )
@@ -117,10 +116,10 @@ let whichOneInclude = function( diamondlist, point ){
 /*  get through the Level to construct the adress
 */
 let locate = function( point, startingElements, N ){
-    initialDiamond = whichOneInclude( startingElements, point  )
-    diamondlist = [initialDiamond, ]
+    let initialDiamond = whichOneInclude( startingElements, point  )
+    let diamondlist = [initialDiamond, ]
     for (let i=0; i<N; i++){
-        nextDiamonds = diamondlist[i].subdivise()
+        let nextDiamonds = diamondlist[i].subdivise()
         diamondlist.push( whichOneInclude( nextDiamonds, point ) )
     }
     return diamondlist
