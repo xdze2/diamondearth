@@ -54,21 +54,21 @@
         // let losangeA = L.losange(latlngs, {color: 'red'}).addTo(map);
 
         octaedre =  build_octaedre()
-        for (var i = 0; i < octaedre.length; i++) {
+        // for (var i = 0; i < octaedre.length; i++) {
+        //
+        //     L.polygon(octaedre[i].points(), {color: 'blue'}).addTo(map);
+        // }
 
-            L.polygon(octaedre[i].points(), {color: 'blue'}).addTo(map);
-        }
-
-        M = new LatLon( 10, 10 )
+        M = new LatLon( 45.188529, 5.724524 )
         let isHere = whichOneInclude( octaedre, M )
         console.log( isHere )
 
-        let whereItIs = locate( M, octaedre, 11 )
+        let whereItIs = locate( M, octaedre, 20 )
         console.log( whereItIs )
 
         for (var i = 0; i < whereItIs.length; i++) {
 
-            L.polygon(whereItIs[i].points(), {color: 'white', weight: 1 }).addTo(map);
+            L.polygon(whereItIs[i].points(), {color: 'red', weight: 1, fill:false }).addTo(map);
         }
         // let N = new LatLon(10, 0)
         // let E = new LatLon(0, 10)

@@ -147,3 +147,19 @@ let build_octaedre = function (){
     }
     return octaedre
 }
+let build_cube = function (){
+    let k = 0
+    let thetaZero = +20   // arbitrary orientation angle for the octaedre
+    let names = ['A', 'B', 'C', 'D']
+    let octaedre = []
+    for (let k=0; k<4; k++) {
+        let N = new LatLon(90, thetaZero + 90*k)
+        let E = new LatLon(0, thetaZero + 45 + 90*k)
+        let S = new LatLon(-90, thetaZero + 90*k)
+        let W = new LatLon(0, thetaZero - 45 + 90*k)
+
+        let d = new Diamond( N, E, S, W, 0, names[k] )
+        octaedre.push( d )
+    }
+    return octaedre
+}
