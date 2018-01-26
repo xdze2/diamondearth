@@ -10,6 +10,13 @@
  *
  */
 
+/**
+ * Mesh system subdivising the Earth surface
+ * @constructor
+ */
+function EarthMesh(){
+
+}
 
 /**
  * Creates a Diamond object
@@ -155,7 +162,25 @@ function buildTheAdress( diamondList ){
  *
  * @return {Array<Diamond>}
  */
-let build_octaedre = function (){
+ let build_octaedre = function (theta = 20){
+    let N = new LatLon( +90, 0 ) // North pole
+    let S = new LatLon( -90, 0 )
+
+    let A = new LatLon( 0, theta ) // points on the equator
+    let B = new LatLon( 0, theta + 90 )
+    let C = new LatLon( 0, theta + 180 )
+    let D = new LatLon( 0, theta - 90 )
+
+    let octaedre = [
+        new Diamond( N, B, S, A, 0, 'A' ),
+        new Diamond( N, C, S, B, 0, 'B' ),
+        new Diamond( N, D, S, C, 0, 'C' ),
+        new Diamond( N, A, S, D, 0, 'D' )
+    ]
+
+    return octaedre
+ }
+let build_octaedre_old = function (){
     let k = 0
     let thetaZero = +20   // arbitrary orientation angle for the octaedre
     let names = ['A', 'B', 'C', 'D']
