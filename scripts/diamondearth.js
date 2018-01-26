@@ -1,17 +1,25 @@
 "use strict";
 
+/**
+ * Hierarchical subdivision of the spherical earth surface
+ * in order to provide an universal addressing method
+ *
+ *
+ * @module   diamondearth
+ * @requires latlon-vectors
+ *
+ */
 
 
 /**
  * Creates a Diamond object
- * from the North, Est, West and South points
- *
+ * @param       {LatLon} N     North point
+ * @param       {LatLon} E     Est point
+ * @param       {LatLon} S     South point
+ * @param       {LatLon} W     West point
+ * @param       {int} level    zoom level it belongs to
+ * @param       {string} name  name
  * @constructor
- * @param {LatLon object} N - North point.
- * @param {LatLon object} E - Est point.
- * @param {LatLon object} S - South point.
- * @param {LatLon object} W - West point.
-
  */
  function Diamond(N, E, S, W, level, name) {
     this.N = N
@@ -25,12 +33,12 @@
  }
 
 
- /**
-  * Returns the four sub-diamond
-  *
-  * @returns {Array of Diamond object} Array of Diamonds, North, Est, South, West.
-  *
-  */
+/**
+ * Returns the four sub-diamond
+ * in clockwise order, starting from North
+ *
+ * @return {Array<Diamond>} Array of Diamond object
+ */
 Diamond.prototype.subdivise = function() {
     let NE = this.N.midpointTo( this.E )
     let SE = this.S.midpointTo( this.E )
@@ -48,21 +56,16 @@ Diamond.prototype.subdivise = function() {
 
 
 /**
- * Converts the Diamond to an Array of coords LatLon
- * in order to be plot on a map
+ * Returns an array of points [lat, lon]
+ * along the Geodesic Lines of the Globe
+ * in order to draw the Diamond on a map.
  *
- * TODO insert additional point to be on geodesic line
- *
- * @returns  {Array} Latitude/longitude point vector points to.
- *
- * @example
- *   var v = new Vector3d(0.500, 0.500, 0.707);
- *   var p = v.toLatLonS(); // 45.0°N, 45.0°E
+ * @returns  {Array} [[Lat., Long.], ... ] coords
  */
-Diamond.prototype.points = function() {
+Diamond.prototype.geodesicPoints = function() {
     let points = this.cardinalPoints
 
-    let k = 8   // number of refinement
+    let k = Math.max( 0, 8-this.level )   // number of refinement
     for (let i = 0; i<k; i++){
         points = refinePolygon(points)
     }
@@ -70,37 +73,43 @@ Diamond.prototype.points = function() {
 };
 
 /**
- * Subdivise the segments of a polygon along the geodesic line
+ * Add a mid-point between every points,
+ * on the geodesic lines
  *
- * @param {Array of LatLon object}
- * @return {Array of LatLon object}
+ * @param  {Array<LatLon>} points A polygon
+ * @return {Array<LatLon>}        A refined polygon
  */
-function refinePolygon( cardinalPoints ){
+function refinePolygon( points ){
     // add the mid point for every segment
-    let points = []
-    for (let i = 0; i < cardinalPoints.length; i++) {
-        let startpoint = cardinalPoints[i]
-        let endpoint = cardinalPoints[ ((i+1 < cardinalPoints.length) ? i+1 : 0) ]
+    let refinedpoints = []
+    for (let i = 0; i < points.length; i++) {
+        let startpoint = points[i]
+        let endpoint = points[ ((i+1 < points.length) ? i+1 : 0) ]
 
         let midpoint = startpoint.midpointTo( endpoint )
-        points.push( startpoint )
-        points.push( midpoint )
+        refinedpoints.push( startpoint )
+        refinedpoints.push( midpoint )
     }
-    return points
+    return refinedpoints
 }
 
 
-/* Is the point inside the Diamond ?
- *
- *  point is a LatLon object
-*/
+/**
+ * Is the point inside in the Diamond ?
+ * @param  {LatLon} point the point
+ * @return {boolean}       true if inside
+ */
 Diamond.prototype.doInclude = function( point ){
     return point.enclosedBy( this.cardinalPoints )
 }
 
-/*  Look for the Diamond in list which include the point
 
-*/
+/**
+ * Look for the Diamond which include the point
+ * @param  {Array<Diamond>} diamondlist Array of Diamond to search
+ * @param  {LatLon} point       the point
+ * @return {Diamond}             the Diamond which include the point
+ */
 let whichOneInclude = function( diamondlist, point ){
 
     for (let i=0; i<diamondlist.length; i++){
@@ -108,13 +117,21 @@ let whichOneInclude = function( diamondlist, point ){
             return diamondlist[i]
         }
     }
-    console.log('point not included in ')
+    console.log( 'debug: ', point )
+    console.log('is not included in ')
     console.log( diamondlist )
 }
 
 
-/*  get through the Level to construct the adress
-*/
+/**
+ * Dive through the succesive sub-Diamonds
+ * which include the point
+ *
+ * @param  {LatLon} point            the point
+ * @param  {Array<Diamond>} startingElements List of the starting Diamond
+ * @param  {int} N               Number of level to descent
+ * @return {Array<Diamond>}               The list of crossed Diamond
+ */
 let locate = function( point, startingElements, N ){
     let initialDiamond = whichOneInclude( startingElements, point  )
     let diamondlist = [initialDiamond, ]
@@ -126,10 +143,18 @@ let locate = function( point, startingElements, N ){
 }
 
 
-/* Octaedre initial volume
-    return a list of Diamond object for the level 0
-*/
-// Level 0
+function buildTheAdress( diamondList ){
+    let nameList = diamondList.map( x => x.name )
+    let adress = nameList.join( '' )
+    return adress
+}
+
+/**
+ * Initial Volume - Octaedre
+ * the Level 0 subdivision of the Globe
+ *
+ * @return {Array<Diamond>}
+ */
 let build_octaedre = function (){
     let k = 0
     let thetaZero = +20   // arbitrary orientation angle for the octaedre
@@ -146,19 +171,12 @@ let build_octaedre = function (){
     }
     return octaedre
 }
+/** TODO
+ * Initial Volume - cube
+ * the Level 0 subdivision of the Globe
+ *
+ * @return {Array<Diamond>}
+ */
 let build_cube = function (){
-    let k = 0
-    let thetaZero = +20   // arbitrary orientation angle for the octaedre
-    let names = ['A', 'B', 'C', 'D']
-    let octaedre = []
-    for (let k=0; k<4; k++) {
-        let N = new LatLon(90, thetaZero + 90*k)
-        let E = new LatLon(0, thetaZero + 45 + 90*k)
-        let S = new LatLon(-90, thetaZero + 90*k)
-        let W = new LatLon(0, thetaZero - 45 + 90*k)
-
-        let d = new Diamond( N, E, S, W, 0, names[k] )
-        octaedre.push( d )
-    }
-    return octaedre
+    return 1
 }

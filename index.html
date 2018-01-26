@@ -28,14 +28,24 @@
 </head>
 
 <body>
-    <h1> Diamond Earth </h1>
-
      <div id="earthmap"></div>
 
     <script>
-        var map = L.map('earthmap').setView([51.505, -0.09], 2);
+        let map = L.map('earthmap').setView([51.505, -0.09], 2);
 
         L.tileLayer('https://api.mapbox.com/styles/v1/xdze2/cjcmgr3ty1cki2sqf7ojleqbu/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoieGR6ZTIiLCJhIjoiY2phc3N3czVsMDVoczMzbjByMDF2NWhmciJ9.XH1KQOO7DJLs3jKg4Xx3Zg').addTo(map);
+
+        map.on('moveend', function(e) {
+            // L.polygon.removeFrom( map )
+
+            let bounds = map.getBounds()
+            let center = map.getCenter()
+            console.log( bounds )
+
+            let M = new LatLon( center.lat, center.lng )
+            console.log( buildTheAdress( center ) )
+            plot( M )
+        });
 
         // var latlngs = [
         //     [89, 45],
@@ -53,23 +63,24 @@
         // ];
         // let losangeA = L.losange(latlngs, {color: 'red'}).addTo(map);
 
-        octaedre =  build_octaedre()
+        let octaedre =  build_octaedre()
         // for (var i = 0; i < octaedre.length; i++) {
         //
         //     L.polygon(octaedre[i].points(), {color: 'blue'}).addTo(map);
         // }
+        function plot( M ){
+            let isHere = whichOneInclude( octaedre, M )
+            console.log( isHere )
 
-        M = new LatLon( 45.188529, 5.724524 )
-        let isHere = whichOneInclude( octaedre, M )
-        console.log( isHere )
+            let whereItIs = locate( M, octaedre, 4 )
+            console.log( whereItIs )
 
-        let whereItIs = locate( M, octaedre, 20 )
-        console.log( whereItIs )
-
-        for (var i = 0; i < whereItIs.length; i++) {
-
-            L.polygon(whereItIs[i].points(), {color: 'red', weight: 1, fill:false }).addTo(map);
+            for (var i = 0; i < whereItIs.length; i++) {
+                L.polygon(whereItIs[i].geodesicPoints(), {color: 'red', weight: 1, fill:false }).addTo(map);
+            }
         }
+        M = new LatLon( 45.188529, 5.724524 )
+        plot( M )
         // let N = new LatLon(10, 0)
         // let E = new LatLon(0, 10)
         // let S = new LatLon(-10, 0)
