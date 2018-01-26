@@ -80,6 +80,8 @@
             }
         }
         M = new LatLon( 45.188529, 5.724524 )
+        console.log( octaedre.map( x => x.doInclude(M) ) )
+
         // plot( M )
         let octa = build_octaedre( theta = -25 )
         L.polygon(octa[2].geodesicPoints(), {color: 'white', weight: 1, fill:true }).addTo(map)

@@ -106,8 +106,29 @@ function refinePolygon( points ){
  * @param  {LatLon} point the point
  * @return {boolean}       true if inside
  */
-Diamond.prototype.doInclude = function( point ){
+Diamond.prototype.doInclude_old = function( point ){
+    /* bug sur l'antimeridien... */
     return point.enclosedBy( this.cardinalPoints )
+}
+Diamond.prototype.doInclude = function( point ){
+    let isinside = true
+
+    const M = point.toVector()
+    const points = [this.N, this.E, this.S, this.W, this.N]
+                        .map( x => x.toVector() )
+
+    for (let i = 0; i < points.length-1; i++) {
+        const A = points[i]     // segment AB
+        const B = points[ i+1 ]
+        const n = A.cross( B ) // vector normal to OA, OB
+        const p = n.dot( M ) // projection of M on n
+        if( p < 0 ){
+            isinside = false
+            break
+        }
+    }
+
+    return isinside
 }
 
 
