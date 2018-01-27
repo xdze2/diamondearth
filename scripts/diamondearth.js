@@ -10,13 +10,6 @@
  *
  */
 
-/**
- * Mesh system subdivising the Earth surface
- * @constructor
- */
-function EarthMesh(){
-
-}
 
 /**
  * Creates a Diamond object
@@ -81,7 +74,6 @@ Diamond.prototype.geodesicPoints = function() {
 
     /* Deals with the antimeridien crossing (-180°)
        if the polygon cross the anti-meridian
-       TODO the actual test is not exactly true !!
        convert negative lon. to positve  cad +360
      */
     const max_lon = Math.max.apply(Math, points.map( x=>x[1]))
@@ -143,9 +135,9 @@ Diamond.prototype.doInclude = function( point ){
     for (let i = 0; i < points.length-1; i++) {
         const A = points[i]     // segment AB
         const B = points[ i+1 ]
-        const n = A.cross( B ) // vector normal to OA, OB
-        const p = n.dot( M ) // projection of M on n
-        if( p < 0 ){
+        const normal = A.cross( B ) // vector normal to OA, OB
+        const p = normal.dot( M ) // projection of M on n
+        if( p > 0 ){ // should be < 0 ... ?
             isinside = false
             break
         }
@@ -175,15 +167,15 @@ let whichOneInclude = function( diamondlist, point ){
 
 
 /**
- * Dive through the succesive sub-Diamonds
- * which include the point
+ * Dive through the succesive N sub-Diamonds
+ * which all includes the point
  *
  * @param  {LatLon} point            the point
  * @param  {Array<Diamond>} startingElements List of the starting Diamond
  * @param  {int} N               Number of level to descent
- * @return {Array<Diamond>}               The list of crossed Diamond
+ * @return {Array<Diamond>}               The list of the crossed Diamonds
  */
-let locate = function( point, startingElements, N ){
+let divethrough  = function( point, startingElements, N ){
     let initialDiamond = whichOneInclude( startingElements, point  )
     let diamondlist = [initialDiamond, ]
     for (let i=0; i<N; i++){
@@ -194,19 +186,13 @@ let locate = function( point, startingElements, N ){
 }
 
 
-function buildTheAdress( diamondList ){
-    let nameList = diamondList.map( x => x.name )
-    let adress = nameList.join( '' )
-    return adress
-}
-
 /**
  * Initial Volume - Octaedre
  * the Level 0 subdivision of the Globe
  *
  * @return {Array<Diamond>}
  */
- let build_octaedre = function (theta = 20){
+ let build_octaedre = function (theta){
     let N = new LatLon( +90, 0 ) // North pole
     let S = new LatLon( -90, 0 )
 
@@ -224,22 +210,6 @@ function buildTheAdress( diamondList ){
 
     return octaedre
  }
-let build_octaedre_old = function (){
-    let k = 0
-    let thetaZero = +20   // arbitrary orientation angle for the octaedre
-    let names = ['A', 'B', 'C', 'D']
-    let octaedre = []
-    for (let k=0; k<4; k++) {
-        let N = new LatLon(90, thetaZero + 90*k)
-        let E = new LatLon(0, thetaZero + 45 + 90*k)
-        let S = new LatLon(-90, thetaZero + 90*k)
-        let W = new LatLon(0, thetaZero - 45 + 90*k)
-
-        let d = new Diamond( N, E, S, W, 0, names[k] )
-        octaedre.push( d )
-    }
-    return octaedre
-}
 /** TODO
  * Initial Volume - cube
  * the Level 0 subdivision of the Globe
@@ -248,4 +218,91 @@ let build_octaedre_old = function (){
  */
 let build_cube = function (){
     return 1
+}
+
+/**
+ * Translate the adress (N, S, E, W) to an human readable adress
+ *
+ * @param  {Array<string>} nameList Array of the Diamonds name (N, S, E, W)
+ * @return {string}         the concatenated and translated adress
+ */
+function translateToShadoks( nameList ){
+    const alphabet = { 'N':'Ga', 'E':'Bu', 'S':'Zo', 'W':'Meu',
+                        'A':'A', 'B':'B', 'C':'C', 'D':'D' }
+
+    let adress = nameList.map( x => alphabet[ x ] )
+
+    return adress.join('')
+}
+
+/* not usefull yet */
+function addSpace( text, n ){
+    let newtext = []
+    for(let i=0; i<text.length; i++){
+        newtext.push( text[i] )
+        if(  (i+1)%n == 0 ){
+            newtext.push( ' ' )
+        }
+    }
+    return newtext.join('')
+}
+
+/**
+ * Mesh system subdivising the Earth surface
+ * @constructor
+ */
+function EarthMesh(){
+    this.initialvolume = build_octaedre( -25 )
+    this.levelmax = 20
+    this.adresstranslator = translateToShadoks
+
+    let adiamond = this.initialvolume[0]
+    this.size0 = adiamond.N.distanceTo( adiamond.S )
+}
+
+/**
+ * Return the human readable adresss for the point
+ *
+ * @param  {LatLon} point the point
+ * @return {string}       the adress
+ */
+EarthMesh.prototype.getadress = function( point ){
+
+    const diamondlist = divethrough( point, this.initialvolume, this.levelmax )
+    const nameList = diamondlist.map( x =>  x.name )
+    const adress = this.adresstranslator( nameList )
+
+    return adress
+}
+// TODO function inverse
+
+/**
+ * return a GEOjson corresponding to the bounding box BOX
+ *
+ * get the last diamond wich include the BB
+ *
+ * sizediamond = size0 / 2^level
+ * Level = Math.log( size0/size )/log( 2 )
+ * level = Math.sqrt( size0/ )
+ */
+EarthMesh.prototype.getGeoJson = function( north, east, south, west, centerPoint ){
+    const NE = new LatLon( north, east )
+    const SW = new LatLon( south, west )
+
+    const size = NE.distanceTo( SW ) // TODO  test the other diag
+    const level_min = Math.floor( Math.log( this.size0/size )/Math.log( 2 ) )
+
+    let maxLevel = level_min + 3
+    const diamondList = divethrough( centerPoint, this.initialvolume, maxLevel  )
+
+    let diamonds = [ [diamondList[level_min]] ]
+    for( let k=1; k<3; k++){
+        diamonds[k] = []
+        for( let i=0; i<diamonds[k-1].length; i++){
+            let subdiamonds = diamonds[k-1][i].subdivise()
+            diamonds[k] = diamonds[k].concat( subdiamonds  )
+        }
+    }
+    diamonds = [].concat.apply([], diamonds); //flatten
+    return diamonds.map( x => x.geodesicPoints() )
 }

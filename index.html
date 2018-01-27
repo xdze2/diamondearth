@@ -31,64 +31,71 @@
      <div id="earthmap"></div>
 
     <script>
+        let mesh = new EarthMesh()
+
         let map = L.map('earthmap').setView([51.505, -0.09], 2);
 
         L.tileLayer('https://api.mapbox.com/styles/v1/xdze2/cjcmgr3ty1cki2sqf7ojleqbu/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoieGR6ZTIiLCJhIjoiY2phc3N3czVsMDVoczMzbjByMDF2NWhmciJ9.XH1KQOO7DJLs3jKg4Xx3Zg').addTo(map);
 
-        // map.on('moveend', function(e) {
-        //     // L.polygon.removeFrom( map )
+        /**
+         * When the map view is changed
+         */
+        map.on('moveend', function(e) {
+            // L.polygon.removeFrom( map )
+
+            let bounds = map.getBounds()
+            const north = bounds.getNorth()
+            const east = bounds.getEast()
+            const west = bounds.getWest()
+            const south = bounds.getSouth()
+
+
+            console.log( south )
+
+            let center = map.getCenter()
+            let M = new LatLon( center.lat, center.lng )
+
+            // plotforapoint( mesh, M )
+            console.log( mesh.getadress( M ) )
+            const polygons =  mesh.getGeoJson( north, east, south, west, M )
+
+            plot( polygons )
+            console.log(polygons);
+        });
+
+        function plot( polygons ){
+            for (let i = 0; i < polygons.length; i++) {
+                L.polygon(polygons[i], {color: 'white', weight: 1, fill:false }).addTo(map);
+            }
+        }
+
         //
-        //     let bounds = map.getBounds()
-        //     let center = map.getCenter()
-        //     console.log( bounds )
-        //
-        //     let M = new LatLon( center.lat, center.lng )
-        //     console.log( buildTheAdress( center ) )
-        //     plot( M )
-        // });
+        // // for (var i = 0; i < octaedre.length; i++) {
+        // //
+        // //     L.polygon(octaedre[i].points(), {color: 'blue'}).addTo(map);
+        // // }
+        function plotforapoint( mesh, M ){
 
-        // var latlngs = [
-        //     [89, 45],
-        //     [0, 90],
-        //     [-89, 45],
-        //     [0, 0]
-        // ];
-        // var losangeA = L.polygon(latlngs, {color: 'red'}).addTo(map);
-
-        // var latlngs = [
-        //     [1, 1],
-        //     [1, 0],
-        //     [0, 0],
-        //     [0, 1]
-        // ];
-        // let losangeA = L.losange(latlngs, {color: 'red'}).addTo(map);
-
-        let octaedre =  build_octaedre()
-        // for (var i = 0; i < octaedre.length; i++) {
-        //
-        //     L.polygon(octaedre[i].points(), {color: 'blue'}).addTo(map);
-        // }
-        function plot( M ){
-            let isHere = whichOneInclude( octaedre, M )
-            console.log( isHere )
-
-            let whereItIs = locate( M, octaedre, 4 )
+            let whereItIs = divethrough( M, mesh.initialvolume, 4 )
             console.log( whereItIs )
 
-            for (var i = 0; i < whereItIs.length; i++) {
+            for (let i = 0; i < whereItIs.length; i++) {
                 L.polygon(whereItIs[i].geodesicPoints(), {color: 'red', weight: 1, fill:false }).addTo(map);
             }
         }
-        M = new LatLon( 45.188529, 5.724524 )
-        console.log( octaedre.map( x => x.doInclude(M) ) )
+        // M = new LatLon( 45.188529, 5.724524 )
+        // console.log( octaedre.map( x => x.doInclude(M) ) )
+        //
+        // // plot( M )
+        // let octa = build_octaedre( theta = -25 )
+        // //L.polygon(octa[2].geodesicPoints(), {color: 'white', weight: 1, fill:true }).addTo(map)
+        //
+        // octaedre.map( function( d ){
+        //     L.polygon(d.geodesicPoints(), {color: 'white', weight: 1, fill:false }).addTo(map)
+        // })
 
-        // plot( M )
-        let octa = build_octaedre( theta = -25 )
-        //L.polygon(octa[2].geodesicPoints(), {color: 'white', weight: 1, fill:true }).addTo(map)
 
-        octaedre.map( function( d ){
-            L.polygon(d.geodesicPoints(), {color: 'white', weight: 1, fill:false }).addTo(map)
-        })
+
         // let N = new LatLon(10, 0)
         // let E = new LatLon(0, 10)
         // let S = new LatLon(-10, 0)
