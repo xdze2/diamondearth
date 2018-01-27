@@ -76,7 +76,30 @@ Diamond.prototype.geodesicPoints = function() {
     for (let i = 0; i<k; i++){
         points = refinePolygon(points)
     }
-    return points.map( x => [x.lat, x.lon] )
+
+    points = points.map( x => [x.lat, x.lon] )
+
+    /* Deals with the antimeridien crossing (-180°)
+       if the polygon cross the anti-meridian
+       TODO the actual test is not exactly true !!
+       convert negative lon. to positve  cad +360
+     */
+    const max_lon = Math.max.apply(Math, points.map( x=>x[1]))
+    const min_lon = Math.min.apply(Math, points.map( x=>x[1]))
+
+    if( Math.sign(max_lon) != Math.sign(min_lon) &&
+            (max_lon - min_lon) > 180 ){
+
+        points = points.map( function(x){
+            if( x[1]<0 ){
+                return [ x[0], x[1]+360 ]
+            } else {
+                return x
+            }
+        })
+    }
+
+    return points
 };
 
 /**

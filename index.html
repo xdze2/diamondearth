@@ -84,10 +84,11 @@
 
         // plot( M )
         let octa = build_octaedre( theta = -25 )
-        L.polygon(octa[2].geodesicPoints(), {color: 'white', weight: 1, fill:true }).addTo(map)
-        // octaedre.map( function( d ){
-        //     L.polygon(d.geodesicPoints(), {color: 'white', weight: 1, fill:false }).addTo(map)
-        // })
+        //L.polygon(octa[2].geodesicPoints(), {color: 'white', weight: 1, fill:true }).addTo(map)
+
+        octaedre.map( function( d ){
+            L.polygon(d.geodesicPoints(), {color: 'white', weight: 1, fill:false }).addTo(map)
+        })
         // let N = new LatLon(10, 0)
         // let E = new LatLon(0, 10)
         // let S = new LatLon(-10, 0)
