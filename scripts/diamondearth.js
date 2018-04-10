@@ -213,11 +213,31 @@ let divethrough  = function( point, startingElements, N ){
 /** TODO
  * Initial Volume - cube
  * the Level 0 subdivision of the Globe
+ * not so ok with the map projection
  *
  * @return {Array<Diamond>}
  */
-let build_cube = function (){
-    return 1
+let build_cube = function ( theta ){
+    let phi = Math.atan( 1/Math.sqrt(2) ) *180/Math.PI
+    let A = new LatLon( phi, theta )
+    let B = new LatLon( phi, theta + 90 )
+    let C = new LatLon( phi, theta + 180 )
+    let D = new LatLon( phi, theta - 90 )
+
+    let E = new LatLon( -phi, theta )
+    let F = new LatLon( -phi, theta + 90 )
+    let G = new LatLon( -phi, theta + 180 )
+    let H = new LatLon( -phi, theta - 90 )
+
+    let cube = [
+        new Diamond( A, D, C, B, 0, 'north' ),
+        new Diamond( E, F, G, H, 0, 'south' ),
+        new Diamond( A, B, F, E, 0, '1' ),
+        new Diamond( B, C, D, F, 0, '2' ),
+        new Diamond( C, D, H, G, 0, '3' ),
+        new Diamond( A, E, H, D, 0, '4' )
+    ]
+    return cube
 }
 
 /**
@@ -303,6 +323,6 @@ EarthMesh.prototype.getGeoJson = function( north, east, south, west, centerPoint
             diamonds[k] = diamonds[k].concat( subdiamonds  )
         }
     }
-    diamonds = [].concat.apply([], diamonds); //flatten
-    return diamonds.map( x => x.geodesicPoints() )
+    // diamonds = [].concat.apply([], diamonds); //flatten
+    return diamonds[diamonds.length-1].map( x => x.geodesicPoints() )
 }

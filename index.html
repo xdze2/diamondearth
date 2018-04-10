@@ -28,14 +28,15 @@
 </head>
 
 <body>
-     <div id="earthmap"></div>
-
+    <div id="wrapper">
+        <div id="earthmap"></div>
+    </div>
     <script>
         let mesh = new EarthMesh()
 
-        let map = L.map('earthmap').setView([51.505, -0.09], 2);
+        let map = L.map('earthmap').setView([51.505, -0.09], 1);
 
-        L.tileLayer('https://api.mapbox.com/styles/v1/xdze2/cjcmgr3ty1cki2sqf7ojleqbu/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoieGR6ZTIiLCJhIjoiY2phc3N3czVsMDVoczMzbjByMDF2NWhmciJ9.XH1KQOO7DJLs3jKg4Xx3Zg').addTo(map);
+        L.tileLayer('https://api.mapbox.com/styles/v1/xdze2/cjcxzgcr51ljg2qnwzjnaidur/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoieGR6ZTIiLCJhIjoiY2phc3N3czVsMDVoczMzbjByMDF2NWhmciJ9.XH1KQOO7DJLs3jKg4Xx3Zg').addTo(map);
 
         /**
          * When the map view is changed
